@@ -26,13 +26,20 @@ vectorizer = joblib.load("vectorizer.pkl")
 @app.post("/predict")
 def predict(payload: MessageIn):
     """
-    Recebe JSON {"message": "..."} e retorna se é spam ou não.
+    Recebe JSON {"message": "..."} e retorna se é spam ou não,
+    junto com a probabilidade.
     """
     message = payload.message
     X = vectorizer.transform([message])
-    pred = model.predict(X)[0]
+
+    # Probabilidades: [prob_ham, prob_spam]
+    proba = model.predict_proba(X)[0]
+
+    prediction = "spam" if proba[1] > proba[0] else "ham"
+    probability = float(max(proba))  # pega a maior probabilidade
+
     return {
         "message": message,
-        "prediction": "spam" if pred == 1 else "ham"
-
+        "prediction": prediction,
+        "probability": probability
     }
