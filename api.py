@@ -20,8 +20,8 @@ class MessageIn(BaseModel):
     message: str
 
 # Carrega modelo e vetor previamente salvos
-model = joblib.load("models/spam_model.pkl")
-vectorizer = joblib.load("models/vectorizer.pkl")
+model = joblib.load("spam_model.pkl")
+vectorizer = joblib.load("vectorizer.pkl")
 
 @app.post("/predict")
 def predict(payload: MessageIn):
@@ -34,4 +34,5 @@ def predict(payload: MessageIn):
     return {
         "message": message,
         "prediction": "spam" if pred == 1 else "ham"
+
     }
