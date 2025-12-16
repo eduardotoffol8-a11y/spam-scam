@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Detector de Spam</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: #fff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      resize: none;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #3498db;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    #resultado {
+      margin-top: 25px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .spam {
+      color: #e74c3c;
+    }
+    .ham {
+      color: #27ae60;
+    }
+    footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #7f8c8d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Detector de Spam</h1>
+    <p>Digite a mensagem abaixo e clique em verificar:</p>
+    <textarea id="mensagem" placeholder="Exemplo: Você ganhou 1 milhão de reais!"></textarea><br>
+    <button onclick="verificar()">Verificar</button>
+    <div id="resultado"></div>
+    <footer>
+      Este serviço ajuda a identificar mensagens suspeitas de spam ou fraude.
+    </footer>
+  </div>
+
+  <script>
+    const API_URL = "http://127.0.0.1:8000/predict"; // altere para seu domínio na nuvem
+
+    async function verificar() {
+      const mensagem = document.getElementById("mensagem").value.trim();
+      const resultadoDiv = document.getElementById("resultado");
+      resultadoDiv.innerText = "";
+
+      if (!mensagem) {
+        resultadoDiv.innerHTML = "<span class='spam'>⚠️ Digite uma mensagem para verificar.</span>";
+        return;
+      }
+
+      try {
+        const resposta = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: mensagem })
+        });
+
+        const dados = await resposta.json();
+        if (dados.prediction === "spam") {
+          resultadoDiv.innerHTML = "<span class='spam'>🚨 Esta mensagem parece ser SPAM!</span>";
+        } else {
+          resultadoDiv.innerHTML = "<span class='ham'>✅ Esta mensagem parece ser SEGURA.</span>";
+        }
+      } catch (e) {
+        resultadoDiv.innerHTML = "<span class='spam'>❌ Erro ao conectar com o servidor. Verifique se a API está rodando.</span>";
+      }
+    }
+  </script>
+</body>
+</html>
